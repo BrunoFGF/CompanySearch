@@ -1,10 +1,10 @@
-echo "📊 Estado de los contenedores:"
+echo "📊 Estado de Company Search Application"
+echo "======================================"
+echo ""
+echo "🐳 Contenedores:"
 docker-compose ps
-
 echo ""
-echo "💾 Uso de volúmenes:"
-docker volume ls | grep company-search
-
-echo ""
-echo "🌐 Red:"
-docker network ls | grep company-search
+echo "🌐 Servicios:"
+echo "   API: $(curl -s http://localhost:5000/swagger > /dev/null && echo "✅ Online" || echo "❌ Offline")"
+echo "   SQL Server: $(docker-compose exec -T sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'MyStrongPass123!' -C -Q 'SELECT 1' > /dev/null 2>&1 && echo "✅ Online" || echo "❌ Offline")"
+echo "   Redis: $(docker-compose exec -T redis redis-cli ping > /dev/null 2>&1 && echo "✅ Online" || echo "❌ Offline")"

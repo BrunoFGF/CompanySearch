@@ -7,13 +7,12 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=${SA_PASSWORD}
     ports:
-      - "1434:1433"
+      - "1435:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
-      - ./database/init:/docker-entrypoint-initdb.d
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P '${SA_PASSWORD}' -Q 'SELECT 1' || exit 1"]
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '${SA_PASSWORD}' -C -Q 'SELECT 1' || exit 1"]
       interval: 15s
       timeout: 10s
       retries: 5
@@ -24,7 +23,7 @@ services:
     image: redis:7-alpine
     container_name: company-search-redis
     ports:
-      - "${REDIS_PORT}:6379"
+      - "6380:6379"
     volumes:
       - redis_data:/data
     restart: unless-stopped
@@ -34,6 +33,28 @@ services:
       interval: 5s
       timeout: 3s
       retries: 5
+
+  # Database Initialization
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: company-search-db-init
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SA_PASSWORD}
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./database/init:/scripts
+    command: >
+      bash -c "
+        echo 'Esperando SQL Server...';
+        sleep 10;
+        echo 'Ejecutando script de inicialización...';
+        /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P '${SA_PASSWORD}' -C -i /scripts/01-init.sql;
+        echo 'Inicialización completada';
+      "
+    restart: "no"
 
   # .NET API
   api:
@@ -53,9 +74,9 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
     restart: unless-stopped
-    volumes:
-      - ./database/init:/app/scripts
 
 volumes:
   sqlserver_data:
