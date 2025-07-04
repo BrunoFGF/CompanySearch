@@ -1,0 +1,212 @@
+{
+	"info": {
+		"_postman_id": "80bbba70-d01c-4221-ad51-c5d7b97b13c9",
+		"name": "CompanySearch",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "24448238"
+	},
+	"item": [
+		{
+			"name": "Buscar por dirección",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/companies/search?searchTerm=ecuador&page=1&pageSize=5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"companies",
+						"search"
+					],
+					"query": [
+						{
+							"key": "searchTerm",
+							"value": "ecuador"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener paginado(ordenados por Id)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/companies?page=1&pageSize=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"companies"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obtener compañía específica por ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": "http://localhost:5000/api/companies/1"
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar por país",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/companies/search?searchTerm=PruebaPais1&page=1&pageSize=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"companies",
+						"search"
+					],
+					"query": [
+						{
+							"key": "searchTerm",
+							"value": "PruebaPais1"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar por dirección o país (listar solo nombres)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5000/api/companies/search/names?searchTerm=alborada&page=1&pageSize=100",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"companies",
+						"search",
+						"names"
+					],
+					"query": [
+						{
+							"key": "searchTerm",
+							"value": "alborada"
+						},
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "pageSize",
+							"value": "100"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Crear compañía",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"La Super Empresa\",\r\n    \"addresses\": [\"Contraseña\", \"ElCorreoElectronico\"],\r\n    \"countries\": [\"Ecuador\", \"PruebaPais1\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:5000/api/companies"
+			},
+			"response": []
+		},
+		{
+			"name": "Actualizar compañia",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Nueva Empresa Tech\",\r\n    \"addresses\": [\"Contraseña\", \"AnotherCosa\"]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://localhost:5000/api/companies/100507"
+			},
+			"response": []
+		},
+		{
+			"name": "Eliminar compañía",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": "http://localhost:5000/api/companies/100507"
+			},
+			"response": []
+		}
+	]
+}
