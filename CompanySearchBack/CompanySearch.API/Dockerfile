@@ -2,7 +2,6 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 8080
-EXPOSE 8081
 
 # Imagen para compilación
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
@@ -30,18 +29,25 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 
-# Instalar herramientas de SQL Server para poder ejecutar scripts
+# Instalar SQL Server tools para ejecutar scripts de inicialización
 USER root
-RUN apt-get update && apt-get install -y curl
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-RUN curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list
-RUN apt-get update && ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
-RUN echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+RUN apt-get update \
+    && apt-get install -y curl gnupg2 \
+    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copiar script de inicialización
-COPY docker-entrypoint.sh /app/
+# Agregar mssql-tools al PATH
+ENV PATH="$PATH:/opt/mssql-tools/bin"
+
+# Copiar y configurar el script de entrada
+COPY CompanySearch.API/docker-entrypoint.sh /app/
 RUN chmod +x /app/docker-entrypoint.sh
 
+# Volver al usuario no-root
 USER $APP_UID
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
