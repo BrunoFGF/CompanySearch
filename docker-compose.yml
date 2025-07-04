@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  # SQL Server Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: company-search-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${SA_PASSWORD}
+    ports:
+      - "1434:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+      - ./database/init:/docker-entrypoint-initdb.d
+    networks:
+      - company-search-network
+    restart: unless-stopped
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: company-search-redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - company-search-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # .NET API
+  api:
+    build:
+      context: ./CompanySearchBack
+      dockerfile: CompanySearch.API/Dockerfile
+    container_name: company-search-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__DefaultConnection=${SQL_CONNECTION_STRING}
+      - ConnectionStrings__Redis=${REDIS_CONNECTION_STRING}
+    ports:
+      - "${API_PORT}:8080"
+      - "${API_HTTPS_PORT}:8081"
+    depends_on:
+      - sqlserver
+      - redis
+    networks:
+      - company-search-network
+    restart: unless-stopped
+    volumes:
+      - ./database/init:/app/scripts
+
+volumes:
+  sqlserver_data:
+  redis_data:
+
+networks:
+  company-search-network:
+    driver: bridge

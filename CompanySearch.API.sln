@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanySearch.API", "CompanySearchBack\CompanySearch.API\CompanySearch.API.csproj", "{FB87261C-42C4-44D7-918D-9931099502A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CompanySearch.Infrastructure", "CompanySearchBack\CompanySearch.Infrastructure\CompanySearch.Infrastructure.csproj", "{D108BE8C-4E60-45B8-97D9-E30507453A40}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FB87261C-42C4-44D7-918D-9931099502A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB87261C-42C4-44D7-918D-9931099502A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB87261C-42C4-44D7-918D-9931099502A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB87261C-42C4-44D7-918D-9931099502A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D108BE8C-4E60-45B8-97D9-E30507453A40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D108BE8C-4E60-45B8-97D9-E30507453A40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D108BE8C-4E60-45B8-97D9-E30507453A40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D108BE8C-4E60-45B8-97D9-E30507453A40}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
