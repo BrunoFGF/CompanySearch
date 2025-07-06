@@ -8,7 +8,8 @@ import type {
     CompanySearchResponse,
     CompanyNamesSearchResponse
 } from '../types/company';
-import { API_CONFIG } from '../config/api';
+
+import {PAGINATION} from "../constants";
 
 interface UseCompaniesState {
     companies: Company[];
@@ -24,7 +25,7 @@ export function useCompanies() {
         companyNames: [],
         pagination: {
             currentPage: 1,
-            pageSize: API_CONFIG.DEFAULT_PAGE_SIZE,
+            pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
             totalPages: 0,
             totalCount: 0,
         },
@@ -46,7 +47,7 @@ export function useCompanies() {
     const searchCompanies = useCallback(async (
         filters: SearchFilters,
         page = 1,
-        pageSize = API_CONFIG.DEFAULT_PAGE_SIZE
+        pageSize = PAGINATION.DEFAULT_PAGE_SIZE
     ) => {
         setState(prev => ({ ...prev, isLoading: true, error: null }));
 
@@ -87,7 +88,7 @@ export function useCompanies() {
 
     const loadAllCompanies = useCallback(async (
         page = 1,
-        pageSize = API_CONFIG.DEFAULT_PAGE_SIZE
+        pageSize = PAGINATION.DEFAULT_PAGE_SIZE
     ) => {
         setState(prev => ({ ...prev, isLoading: true, error: null }));
 

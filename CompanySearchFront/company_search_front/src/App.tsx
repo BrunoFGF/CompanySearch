@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { SearchForm } from './components/SearchForm';
-import { CompanyCard } from './components/CompanyCard';
-import { Pagination } from './components/Pagination';
+import { CompanyList } from './components/CompanyList';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ErrorMessage } from './components/ErrorMessage';
 import { useCompanies } from './hooks/useCompanies';
+import { useSearchState } from './hooks/useSearchState';
 import type { SearchFilters } from './types/company';
 import './App.css';
 
@@ -21,7 +21,7 @@ function App() {
         changePageSize,
     } = useCompanies();
 
-    const [currentFilters, setCurrentFilters] = useState<SearchFilters | null>(null);
+    const { currentFilters, setFilters, clearFilters } = useSearchState();
 
     useEffect(() => {
         loadAllCompanies();
@@ -29,10 +29,10 @@ function App() {
 
     const handleSearch = (filters: SearchFilters) => {
         if (filters.searchTerm.trim()) {
-            setCurrentFilters(filters);
+            setFilters(filters);
             searchCompanies(filters);
         } else {
-            setCurrentFilters(null);
+            clearFilters();
             loadAllCompanies();
         }
     };
@@ -58,92 +58,84 @@ function App() {
 
     return (
         <div className="app">
-            <header className="app__header">
-                <div className="app__container">
-                    <h1 className="app__title">🏢 Buscador de Compañías</h1>
-                    <p className="app__subtitle">
-                        Encuentra compañías por nombre, dirección o país
-                    </p>
-                </div>
-            </header>
+            <Header />
 
             <main className="app__main">
                 <div className="app__container">
-                    <SearchForm onSearch={handleSearch} isLoading={isLoading} />
+                    <div className="app__search-section">
+                        <SearchForm onSearch={handleSearch} isLoading={isLoading} />
+                        {error && <ErrorMessage message={error} onRetry={handleRetry} />}
+                    </div>
 
-                    {error && (
-                        <ErrorMessage message={error} onRetry={handleRetry} />
-                    )}
-
-                    {isLoading && (
-                        <div className="app__loading">
-                            <LoadingSpinner size="large" text="Buscando compañías..." />
-                        </div>
-                    )}
-
-                    {!isLoading && !error && hasResults && (
-                        <div className="app__results">
-                            <div className="app__results-header">
-                                <h2 className="app__results-title">
-                                    {currentFilters
-                                        ? `Resultados para "${currentFilters.searchTerm}"`
-                                        : 'Todas las compañías'
-                                    }
-                                </h2>
-                                <p className="app__results-info">
-                                    Mostrando {showingNames ? 'nombres' : 'información completa'}
-                                </p>
-                            </div>
-
-                            <div className="app__companies-grid">
-                                {showingNames
-                                    ? companyNames.map((company) => (
-                                        <CompanyCard
-                                            key={company.id}
-                                            company={company}
-                                            type="name"
-                                        />
-                                    ))
-                                    : companies.map((company) => (
-                                        <CompanyCard
-                                            key={company.id}
-                                            company={company}
-                                            type="full"
-                                        />
-                                    ))
-                                }
-                            </div>
-
-                            <Pagination
+                    <div className="app__content">
+                        {isLoading ? (
+                            <LoadingContent />
+                        ) : error ? null : hasResults ? (
+                            <CompanyList
+                                companies={companies}
+                                companyNames={companyNames}
+                                showingNames={showingNames}
+                                currentFilters={currentFilters}
                                 pagination={pagination}
                                 onPageChange={handlePageChange}
                                 onPageSizeChange={handlePageSizeChange}
                                 isLoading={isLoading}
                             />
-                        </div>
-                    )}
-
-                    {!isLoading && !error && !hasResults && currentFilters && (
-                        <div className="app__no-results">
-                            <div className="app__no-results-icon">🔍</div>
-                            <h3 className="app__no-results-title">No se encontraron resultados</h3>
-                            <p className="app__no-results-text">
-                                No hay compañías que coincidan con "{currentFilters.searchTerm}".
-                                Intenta con otros términos de búsqueda.
-                            </p>
-                        </div>
-                    )}
+                        ) : currentFilters ? (
+                            <NoResults searchTerm={currentFilters.searchTerm} />
+                        ) : null}
+                    </div>
                 </div>
             </main>
 
-            <footer className="app__footer">
-                <div className="app__container">
-                    <p className="app__footer-text">
-                        Buscador de Compañías
-                    </p>
-                </div>
-            </footer>
+            <Footer />
         </div>
+    );
+}
+
+function Header() {
+    return (
+        <header className="app__header">
+            <div className="app__container">
+                <h1 className="app__title">🏢 Buscador de Compañías</h1>
+                <p className="app__subtitle">
+                    Encuentra compañías por nombre, dirección o país
+                </p>
+            </div>
+        </header>
+    );
+}
+
+function LoadingContent() {
+    return (
+        <div className="app__loading">
+            <LoadingSpinner size="large" text="Buscando compañías..." />
+        </div>
+    );
+}
+
+function NoResults({ searchTerm }: { searchTerm: string }) {
+    return (
+        <div className="app__no-results">
+            <div className="app__no-results-icon">🔍</div>
+            <h3 className="app__no-results-title">No se encontraron resultados</h3>
+            <p className="app__no-results-text">
+                No hay compañías que coincidan con "{searchTerm}".
+                Intenta con otros términos de búsqueda.
+            </p>
+        </div>
+    );
+}
+
+function Footer() {
+    return (
+        <footer className="app__footer">
+            <div className="app__container">
+                <p className="app__footer-text">
+                    Buscador de Compañías
+                </p>
+            </div>
+        </footer>
     );
 }
 

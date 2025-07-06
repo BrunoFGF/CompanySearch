@@ -1,4 +1,5 @@
 import { API_CONFIG, DEFAULT_HEADERS } from '../config/api';
+import {PAGINATION} from "../constants";
 import type {
     Company,
     CompanySearchResponse,
@@ -58,7 +59,7 @@ class CompanyService {
         return this.request<CompanyNamesSearchResponse>(endpoint);
     }
 
-    async getAllCompanies(page = 1, pageSize = API_CONFIG.DEFAULT_PAGE_SIZE): Promise<CompanySearchResponse> {
+    async getAllCompanies(page = 1, pageSize = PAGINATION.DEFAULT_PAGE_SIZE): Promise<CompanySearchResponse> {
         const searchParams = new URLSearchParams({
             page: page.toString(),
             pageSize: pageSize.toString(),
