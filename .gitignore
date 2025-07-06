@@ -17,10 +17,6 @@ obj/
 # Docker
 .docker/
 
-# Environment
-.env.local
-.env.production
-
 # Logs
 *.log
 logs/
