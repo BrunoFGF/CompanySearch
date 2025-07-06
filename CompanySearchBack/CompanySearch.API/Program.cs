@@ -27,6 +27,21 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:3000", 
+                "http://localhost:3001",  
+                "http://127.0.0.1:3000"  
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -35,6 +50,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
 }
 
+app.UseCors("AllowFrontend");
 app.UseHttpsRedirection();  
 app.UseAuthorization();
 app.MapControllers();
