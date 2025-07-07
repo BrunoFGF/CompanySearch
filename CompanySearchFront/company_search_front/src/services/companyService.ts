@@ -1,5 +1,5 @@
 import { API_CONFIG, DEFAULT_HEADERS } from '../config/api';
-import {PAGINATION} from "../constants";
+import { PAGINATION } from "../constants";
 import type {
     Company,
     CompanySearchResponse,
@@ -41,6 +41,9 @@ class CompanyService {
         const searchParams = new URLSearchParams();
 
         if (params.searchTerm) searchParams.append('searchTerm', params.searchTerm);
+        if (params.nameFilter) searchParams.append('nameFilter', params.nameFilter);
+        if (params.addressFilter) searchParams.append('addressFilter', params.addressFilter);
+        if (params.countryFilter) searchParams.append('countryFilter', params.countryFilter);
         if (params.page) searchParams.append('page', params.page.toString());
         if (params.pageSize) searchParams.append('pageSize', params.pageSize.toString());
 
@@ -52,6 +55,8 @@ class CompanyService {
         const searchParams = new URLSearchParams();
 
         if (params.searchTerm) searchParams.append('searchTerm', params.searchTerm);
+        if (params.addressFilter) searchParams.append('addressFilter', params.addressFilter);
+        if (params.countryFilter) searchParams.append('countryFilter', params.countryFilter);
         if (params.page) searchParams.append('page', params.page.toString());
         if (params.pageSize) searchParams.append('pageSize', params.pageSize.toString());
 

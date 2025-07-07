@@ -20,6 +20,9 @@ namespace CompanySearch.API.Controllers
         [HttpGet("search")]
         public async Task<ActionResult<CompanySearchResponse>> SearchCompanies(
             [FromQuery] string? searchTerm = null,
+            [FromQuery] string? nameFilter = null,
+            [FromQuery] string? addressFilter = null,
+            [FromQuery] string? countryFilter = null,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
@@ -31,14 +34,17 @@ namespace CompanySearch.API.Controllers
                 var request = new CompanySearchRequest
                 {
                     SearchTerm = searchTerm,
+                    NameFilter = nameFilter,
+                    AddressFilter = addressFilter,
+                    CountryFilter = countryFilter,
                     Page = page,
                     PageSize = pageSize
                 };
 
                 var response = await _companyService.SearchCompaniesAsync(request);
 
-                _logger.LogInformation("Search completed. Term: {SearchTerm}, Results: {Count}, Page: {Page}",
-                    searchTerm, response.TotalCount, page);
+                _logger.LogInformation("Search completed. General: {SearchTerm}, Name: {NameFilter}, Address: {AddressFilter}, Country: {CountryFilter}, Results: {Count}, Page: {Page}",
+                    searchTerm, nameFilter, addressFilter, countryFilter, response.TotalCount, page);
 
                 return Ok(response);
             }
@@ -52,6 +58,8 @@ namespace CompanySearch.API.Controllers
         [HttpGet("search/names")]
         public async Task<ActionResult<CompanyNamesSearchResponse>> SearchCompanyNames(
             [FromQuery] string? searchTerm = null,
+            [FromQuery] string? addressFilter = null,
+            [FromQuery] string? countryFilter = null,
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
@@ -60,22 +68,24 @@ namespace CompanySearch.API.Controllers
                 if (page < 1) page = 1;
                 if (pageSize < 1 || pageSize > 100) pageSize = 10;
 
-                if (string.IsNullOrEmpty(searchTerm))
+                if (string.IsNullOrEmpty(searchTerm) && string.IsNullOrEmpty(addressFilter) && string.IsNullOrEmpty(countryFilter))
                 {
-                    return BadRequest(new { message = "searchTerm es requerido para búsqueda de nombres" });
+                    return BadRequest(new { message = "Al menos un filtro es requerido para búsqueda de nombres" });
                 }
 
                 var request = new CompanySearchRequest
                 {
                     SearchTerm = searchTerm,
+                    AddressFilter = addressFilter,
+                    CountryFilter = countryFilter,
                     Page = page,
                     PageSize = pageSize
                 };
 
                 var response = await _companyService.SearchCompanyNamesAsync(request);
 
-                _logger.LogInformation("Names search completed. Term: {SearchTerm}, Results: {Count}, Page: {Page}",
-                    searchTerm, response.TotalCount, page);
+                _logger.LogInformation("Names search completed. General: {SearchTerm}, Address: {AddressFilter}, Country: {CountryFilter}, Results: {Count}, Page: {Page}",
+                    searchTerm, addressFilter, countryFilter, response.TotalCount, page);
 
                 return Ok(response);
             }
@@ -117,7 +127,7 @@ namespace CompanySearch.API.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int pageSize = 10)
         {
-            return await SearchCompanies(null, page, pageSize);
+            return await SearchCompanies(null, null, null, null, page, pageSize);
         }
 
         [HttpPost]

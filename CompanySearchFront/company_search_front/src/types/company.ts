@@ -28,6 +28,9 @@ export interface CompanyNamesSearchResponse {
 
 export interface CompanySearchRequest {
     searchTerm?: string;
+    nameFilter?: string;
+    addressFilter?: string;
+    countryFilter?: string;
     page?: number;
     pageSize?: number;
 }
@@ -46,6 +49,9 @@ export interface UpdateCompanyDto {
 
 export interface SearchFilters {
     searchTerm: string;
+    nameFilter: string;
+    addressFilter: string;
+    countryFilter: string;
     searchType: 'all' | 'names';
 }
 

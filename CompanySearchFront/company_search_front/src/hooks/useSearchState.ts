@@ -13,7 +13,12 @@ export function useSearchState() {
     };
 
     const hasActiveFilters = () => {
-        return currentFilters !== null && currentFilters.searchTerm.trim() !== '';
+        return currentFilters !== null && (
+            currentFilters.searchTerm.trim() !== '' ||
+            currentFilters.nameFilter.trim() !== '' ||
+            currentFilters.addressFilter.trim() !== '' ||
+            currentFilters.countryFilter.trim() !== ''
+        );
     };
 
     return {

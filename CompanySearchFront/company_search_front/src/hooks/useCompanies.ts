@@ -6,10 +6,10 @@ import type {
     SearchFilters,
     PaginationInfo,
     CompanySearchResponse,
-    CompanyNamesSearchResponse
+    CompanyNamesSearchResponse,
+    CompanySearchRequest
 } from '../types/company';
-
-import {PAGINATION} from "../constants";
+import { PAGINATION } from '../constants';
 
 interface UseCompaniesState {
     companies: Company[];
@@ -52,8 +52,11 @@ export function useCompanies() {
         setState(prev => ({ ...prev, isLoading: true, error: null }));
 
         try {
-            const params = {
+            const params: CompanySearchRequest = {
                 searchTerm: filters.searchTerm || undefined,
+                nameFilter: filters.nameFilter || undefined,
+                addressFilter: filters.addressFilter || undefined,
+                countryFilter: filters.countryFilter || undefined,
                 page,
                 pageSize,
             };

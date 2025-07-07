@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { SearchForm } from './components/SearchForm';
+import { AdvancedSearchForm } from './components/AdvancedSearchForm';
 import { CompanyList } from './components/CompanyList';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ErrorMessage } from './components/ErrorMessage';
@@ -29,7 +29,12 @@ function App() {
     }, [loadAllCompanies]);
 
     const handleSearch = (filters: SearchFilters) => {
-        if (filters.searchTerm.trim()) {
+        const hasAnyFilter = filters.searchTerm.trim() ||
+            filters.nameFilter.trim() ||
+            filters.addressFilter.trim() ||
+            filters.countryFilter.trim();
+
+        if (hasAnyFilter) {
             setFilters(filters);
             searchCompanies(filters);
         } else {
@@ -55,6 +60,7 @@ function App() {
     };
 
     const handleCompanyChange = () => {
+        // Recargar datos después de crear, editar o eliminar
         if (currentFilters) {
             searchCompanies(currentFilters);
         } else {
@@ -73,7 +79,7 @@ function App() {
                 <main className="app__main">
                     <div className="app__container">
                         <div className="app__search-section">
-                            <SearchForm onSearch={handleSearch} isLoading={isLoading} />
+                            <AdvancedSearchForm onSearch={handleSearch} isLoading={isLoading} />
                             {error && <ErrorMessage message={error} onRetry={handleRetry} />}
                         </div>
 
@@ -93,7 +99,7 @@ function App() {
                                     isLoading={isLoading}
                                 />
                             ) : currentFilters ? (
-                                <NoResults searchTerm={currentFilters.searchTerm} />
+                                <NoResults />
                             ) : null}
                         </div>
                     </div>
@@ -127,13 +133,13 @@ function LoadingContent() {
     );
 }
 
-function NoResults({ searchTerm }: { searchTerm: string }) {
+function NoResults() {
     return (
         <div className="app__no-results">
             <div className="app__no-results-icon">🔍</div>
             <h3 className="app__no-results-title">No se encontraron resultados</h3>
             <p className="app__no-results-text">
-                No hay compañías que coincidan con "{searchTerm}".
+                No hay compañías que coincidan con los filtros aplicados.
                 Intenta con otros términos de búsqueda.
             </p>
         </div>

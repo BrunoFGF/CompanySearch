@@ -24,28 +24,20 @@ namespace CompanySearch.API.Services
         {
             try
             {
-                var cacheKey = $"company_search:{request.SearchTerm?.ToLower() ?? "all"}:{request.Page}:{request.PageSize}";
+                var cacheKey = GenerateSearchCacheKey(request);
 
                 var cachedResult = await _cacheService.GetAsync<CompanySearchResponse>(cacheKey);
                 if (cachedResult != null)
                 {
-                    _logger.LogInformation("Cache HIT - Returning cached results for search: {SearchTerm}", request.SearchTerm);
+                    _logger.LogInformation("Cache HIT - Returning cached results for search");
                     return cachedResult;
                 }
 
-                _logger.LogInformation("Cache MISS - Querying database for search: {SearchTerm}", request.SearchTerm);
+                _logger.LogInformation("Cache MISS - Querying database for search");
 
                 var query = _context.Companies.AsQueryable();
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
-                {
-                    var searchTerm = request.SearchTerm.ToLower().Trim();
-                    query = query.Where(c =>
-                        c.Name.ToLower().Contains(searchTerm) ||
-                        c.Addresses.ToLower().Contains(searchTerm) ||
-                        c.Countries.ToLower().Contains(searchTerm)
-                    );
-                }
+                query = ApplyFilters(query, request);
 
                 var totalCount = await query.CountAsync();
 
@@ -75,7 +67,7 @@ namespace CompanySearch.API.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error searching companies with term: {SearchTerm}", request.SearchTerm);
+                _logger.LogError(ex, "Error searching companies");
                 throw;
             }
         }
@@ -84,27 +76,20 @@ namespace CompanySearch.API.Services
         {
             try
             {
-                var cacheKey = $"company_names:{request.SearchTerm?.ToLower() ?? "all"}:{request.Page}:{request.PageSize}";
+                var cacheKey = GenerateNamesCacheKey(request);
 
                 var cachedResult = await _cacheService.GetAsync<CompanyNamesSearchResponse>(cacheKey);
                 if (cachedResult != null)
                 {
-                    _logger.LogInformation("Cache HIT - Returning cached names for search: {SearchTerm}", request.SearchTerm);
+                    _logger.LogInformation("Cache HIT - Returning cached names for search");
                     return cachedResult;
                 }
 
-                _logger.LogInformation("Cache MISS - Querying database for names search: {SearchTerm}", request.SearchTerm);
+                _logger.LogInformation("Cache MISS - Querying database for names search");
 
                 var query = _context.Companies.AsQueryable();
 
-                if (!string.IsNullOrEmpty(request.SearchTerm))
-                {
-                    var searchTerm = request.SearchTerm.ToLower().Trim();
-                    query = query.Where(c =>
-                        c.Addresses.ToLower().Contains(searchTerm) ||
-                        c.Countries.ToLower().Contains(searchTerm)
-                    );
-                }
+                query = ApplyFiltersForNames(query, request);
 
                 var totalCount = await query.CountAsync();
 
@@ -135,9 +120,97 @@ namespace CompanySearch.API.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error searching company names with term: {SearchTerm}", request.SearchTerm);
+                _logger.LogError(ex, "Error searching company names");
                 throw;
             }
+        }
+
+        private IQueryable<Company> ApplyFilters(IQueryable<Company> query, CompanySearchRequest request)
+        {
+            if (!string.IsNullOrEmpty(request.SearchTerm))
+            {
+                var searchTerm = request.SearchTerm.ToLower().Trim();
+                query = query.Where(c =>
+                    c.Name.ToLower().Contains(searchTerm) ||
+                    c.Addresses.ToLower().Contains(searchTerm) ||
+                    c.Countries.ToLower().Contains(searchTerm)
+                );
+            }
+
+            if (!string.IsNullOrEmpty(request.NameFilter))
+            {
+                var nameFilter = request.NameFilter.ToLower().Trim();
+                query = query.Where(c => c.Name.ToLower().Contains(nameFilter));
+            }
+
+            if (!string.IsNullOrEmpty(request.AddressFilter))
+            {
+                var addressFilter = request.AddressFilter.ToLower().Trim();
+                query = query.Where(c => c.Addresses.ToLower().Contains(addressFilter));
+            }
+
+            if (!string.IsNullOrEmpty(request.CountryFilter))
+            {
+                var countryFilter = request.CountryFilter.ToLower().Trim();
+                query = query.Where(c => c.Countries.ToLower().Contains(countryFilter));
+            }
+
+            return query;
+        }
+
+        private IQueryable<Company> ApplyFiltersForNames(IQueryable<Company> query, CompanySearchRequest request)
+        {
+            if (!string.IsNullOrEmpty(request.SearchTerm))
+            {
+                var searchTerm = request.SearchTerm.ToLower().Trim();
+                query = query.Where(c =>
+                    c.Addresses.ToLower().Contains(searchTerm) ||
+                    c.Countries.ToLower().Contains(searchTerm)
+                );
+            }
+
+            if (!string.IsNullOrEmpty(request.AddressFilter))
+            {
+                var addressFilter = request.AddressFilter.ToLower().Trim();
+                query = query.Where(c => c.Addresses.ToLower().Contains(addressFilter));
+            }
+
+            if (!string.IsNullOrEmpty(request.CountryFilter))
+            {
+                var countryFilter = request.CountryFilter.ToLower().Trim();
+                query = query.Where(c => c.Countries.ToLower().Contains(countryFilter));
+            }
+
+            return query;
+        }
+
+        private string GenerateSearchCacheKey(CompanySearchRequest request)
+        {
+            var keyParts = new List<string>
+            {
+                "company_search",
+                request.SearchTerm?.ToLower() ?? "null",
+                request.NameFilter?.ToLower() ?? "null",
+                request.AddressFilter?.ToLower() ?? "null",
+                request.CountryFilter?.ToLower() ?? "null",
+                request.Page.ToString(),
+                request.PageSize.ToString()
+            };
+            return string.Join(":", keyParts);
+        }
+
+        private string GenerateNamesCacheKey(CompanySearchRequest request)
+        {
+            var keyParts = new List<string>
+            {
+                "company_names",
+                request.SearchTerm?.ToLower() ?? "null",
+                request.AddressFilter?.ToLower() ?? "null",
+                request.CountryFilter?.ToLower() ?? "null",
+                request.Page.ToString(),
+                request.PageSize.ToString()
+            };
+            return string.Join(":", keyParts);
         }
 
         public async Task<CompanyDto?> GetCompanyByIdAsync(int id)
@@ -242,11 +315,7 @@ namespace CompanySearch.API.Services
 
                 _logger.LogInformation("Company updated successfully. ID: {Id}, Name: {Name}", id, existingCompany.Name);
 
-                _logger.LogInformation("Clearing cache for updated company ID: {Id}", id);
-
                 await _cacheService.RemoveAsync($"company_id:{id}");
-
-                _logger.LogInformation("Clearing all search caches due to company update");
                 await _cacheService.RemoveByPatternAsync("company_search:*");
                 await _cacheService.RemoveByPatternAsync("company_names:*");
 
