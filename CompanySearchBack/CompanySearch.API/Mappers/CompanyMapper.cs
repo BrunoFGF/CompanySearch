@@ -15,22 +15,11 @@ namespace CompanySearch.API.Mappers
                 Countries = ParseJsonArray(company.Countries)
             };
         }
-        public static CompanyNameDto ToNameDto(Company company)
-        {
-            return new CompanyNameDto
-            {
-                Id = company.Id,
-                Name = company.Name
-            };
-        }
         public static List<CompanyDto> ToDto(IEnumerable<Company> companies)
         {
             return companies.Select(ToDto).ToList();
         }
-        public static List<CompanyNameDto> ToNameDto(IEnumerable<Company> companies)
-        {
-            return companies.Select(ToNameDto).ToList();
-        }
+
         public static string SerializeJsonArray(List<string> stringList)
         {
             try

@@ -1,12 +1,10 @@
 import { CompanyCard } from './CompanyCard';
 import { Pagination } from './Pagination';
 import { CompanyManager } from './CompanyManager';
-import type { Company, CompanyName, SearchFilters, PaginationInfo } from '../types/company';
+import type { Company, SearchFilters, PaginationInfo } from '../types/company';
 
 interface CompanyListProps {
     companies: Company[];
-    companyNames: CompanyName[];
-    showingNames: boolean;
     currentFilters: SearchFilters | null;
     pagination: PaginationInfo;
     onPageChange: (page: number) => void;
@@ -17,8 +15,6 @@ interface CompanyListProps {
 
 export function CompanyList({
                                 companies,
-                                companyNames,
-                                showingNames,
                                 currentFilters,
                                 pagination,
                                 onPageChange,
@@ -28,13 +24,16 @@ export function CompanyList({
                             }: CompanyListProps) {
     const getResultsTitle = () => {
         if (currentFilters) {
-            return `Resultados para "${currentFilters.searchTerm}"`;
+            const activeFilters = [
+                currentFilters.searchTerm,
+                currentFilters.nameFilter,
+                currentFilters.addressFilter,
+                currentFilters.countryFilter
+            ].filter(filter => filter.trim()).join(', ');
+
+            return `Resultados para: ${activeFilters}`;
         }
         return 'Todas las compañías';
-    };
-
-    const getResultsInfo = () => {
-        return `Mostrando ${showingNames ? 'nombres' : 'información completa'}`;
     };
 
     const handleEditCompany = (company: Company) => {
@@ -42,7 +41,7 @@ export function CompanyList({
         window.dispatchEvent(event);
     };
 
-    const handleDeleteCompany = (company: Company | CompanyName) => {
+    const handleDeleteCompany = (company: Company) => {
         const event = new CustomEvent('deleteCompany', { detail: company });
         window.dispatchEvent(event);
     };
@@ -52,33 +51,21 @@ export function CompanyList({
             <div className="app__results">
                 <div className="app__results-header">
                     <h2 className="app__results-title">{getResultsTitle()}</h2>
-                    <p className="app__results-info">{getResultsInfo()}</p>
+                    <p className="app__results-info">Información completa de las compañías</p>
                 </div>
 
                 <div className="app__companies-container">
                     <div className="app__companies-scroll">
                         <div className="app__companies-grid">
-                            {showingNames
-                                ? companyNames.map((company) => (
-                                    <CompanyCard
-                                        key={company.id}
-                                        company={company}
-                                        type="name"
-                                        showActions={true}
-                                        onDelete={handleDeleteCompany}
-                                    />
-                                ))
-                                : companies.map((company) => (
-                                    <CompanyCard
-                                        key={company.id}
-                                        company={company}
-                                        type="full"
-                                        showActions={true}
-                                        onEdit={handleEditCompany}
-                                        onDelete={handleDeleteCompany}
-                                    />
-                                ))
-                            }
+                            {companies.map((company) => (
+                                <CompanyCard
+                                    key={company.id}
+                                    company={company}
+                                    showActions={true}
+                                    onEdit={handleEditCompany}
+                                    onDelete={handleDeleteCompany}
+                                />
+                            ))}
                         </div>
                     </div>
 

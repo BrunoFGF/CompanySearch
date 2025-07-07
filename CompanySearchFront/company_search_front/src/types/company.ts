@@ -5,21 +5,8 @@ export interface Company {
     countries: string[];
 }
 
-export interface CompanyName {
-    id: number;
-    name: string;
-}
-
 export interface CompanySearchResponse {
     companies: Company[];
-    totalCount: number;
-    page: number;
-    pageSize: number;
-    totalPages: number;
-}
-
-export interface CompanyNamesSearchResponse {
-    companies: CompanyName[];
     totalCount: number;
     page: number;
     pageSize: number;
@@ -52,7 +39,6 @@ export interface SearchFilters {
     nameFilter: string;
     addressFilter: string;
     countryFilter: string;
-    searchType: 'all' | 'names';
 }
 
 export interface PaginationInfo {

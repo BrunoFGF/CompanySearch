@@ -2,18 +2,15 @@ import { useState, useCallback } from 'react';
 import { companyService } from '../services/companyService';
 import type {
     Company,
-    CompanyName,
     SearchFilters,
     PaginationInfo,
     CompanySearchResponse,
-    CompanyNamesSearchResponse,
     CompanySearchRequest
 } from '../types/company';
 import { PAGINATION } from '../constants';
 
 interface UseCompaniesState {
     companies: Company[];
-    companyNames: CompanyName[];
     pagination: PaginationInfo;
     isLoading: boolean;
     error: string | null;
@@ -22,7 +19,6 @@ interface UseCompaniesState {
 export function useCompanies() {
     const [state, setState] = useState<UseCompaniesState>({
         companies: [],
-        companyNames: [],
         pagination: {
             currentPage: 1,
             pageSize: PAGINATION.DEFAULT_PAGE_SIZE,
@@ -33,9 +29,7 @@ export function useCompanies() {
         error: null,
     });
 
-    const updatePagination = useCallback((
-        response: CompanySearchResponse | CompanyNamesSearchResponse
-    ) => {
+    const updatePagination = useCallback((response: CompanySearchResponse) => {
         return {
             currentPage: response.page,
             pageSize: response.pageSize,
@@ -61,25 +55,13 @@ export function useCompanies() {
                 pageSize,
             };
 
-            if (filters.searchType === 'names') {
-                const response = await companyService.searchCompanyNames(params);
-                setState(prev => ({
-                    ...prev,
-                    companyNames: response.companies,
-                    companies: [],
-                    pagination: updatePagination(response),
-                    isLoading: false,
-                }));
-            } else {
-                const response = await companyService.searchCompanies(params);
-                setState(prev => ({
-                    ...prev,
-                    companies: response.companies,
-                    companyNames: [],
-                    pagination: updatePagination(response),
-                    isLoading: false,
-                }));
-            }
+            const response = await companyService.searchCompanies(params);
+            setState(prev => ({
+                ...prev,
+                companies: response.companies,
+                pagination: updatePagination(response),
+                isLoading: false,
+            }));
         } catch (error) {
             setState(prev => ({
                 ...prev,
@@ -100,7 +82,6 @@ export function useCompanies() {
             setState(prev => ({
                 ...prev,
                 companies: response.companies,
-                companyNames: [],
                 pagination: updatePagination(response),
                 isLoading: false,
             }));

@@ -4,7 +4,7 @@ import { DeleteConfirmation } from './DeleteConfirmation';
 import { Modal } from './Modal';
 import { useCompanyCrud } from '../hooks/useCompanyCrud';
 import { useToastContext } from '../hooks/useToastContext';
-import type { Company, CompanyName, CreateCompanyDto, UpdateCompanyDto } from '../types/company';
+import type { Company, CreateCompanyDto, UpdateCompanyDto } from '../types/company';
 
 interface CompanyManagerProps {
     onCompanyChange?: () => void;
@@ -15,7 +15,7 @@ export function CompanyManager({ onCompanyChange }: CompanyManagerProps) {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
-    const [companyToDelete, setCompanyToDelete] = useState<Company | CompanyName | null>(null);
+    const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
 
     const {
         isCreating,
@@ -35,7 +35,7 @@ export function CompanyManager({ onCompanyChange }: CompanyManagerProps) {
             openEditModal(event.detail);
         };
 
-        const handleDeleteCompany = (event: CustomEvent<Company | CompanyName>) => {
+        const handleDeleteCompany = (event: CustomEvent<Company>) => {
             openDeleteModal(event.detail);
         };
 
@@ -106,7 +106,7 @@ export function CompanyManager({ onCompanyChange }: CompanyManagerProps) {
         setIsEditModalOpen(true);
     };
 
-    const openDeleteModal = (company: Company | CompanyName) => {
+    const openDeleteModal = (company: Company) => {
         clearError();
         setCompanyToDelete(company);
         setIsDeleteModalOpen(true);

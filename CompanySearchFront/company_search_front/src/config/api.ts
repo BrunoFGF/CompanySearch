@@ -3,7 +3,6 @@ export const API_CONFIG = {
     ENDPOINTS: {
         companies: '/api/companies',
         search: '/api/companies/search',
-        searchNames: '/api/companies/search/names',
     }
 } as const;
 

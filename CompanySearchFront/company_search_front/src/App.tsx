@@ -12,7 +12,6 @@ import './App.css';
 function App() {
     const {
         companies,
-        companyNames,
         pagination,
         isLoading,
         error,
@@ -68,8 +67,7 @@ function App() {
         }
     };
 
-    const hasResults = companies.length > 0 || companyNames.length > 0;
-    const showingNames = companyNames.length > 0;
+    const hasResults = companies.length > 0;
 
     return (
         <ToastProvider>
@@ -89,8 +87,6 @@ function App() {
                             ) : error ? null : hasResults ? (
                                 <CompanyList
                                     companies={companies}
-                                    companyNames={companyNames}
-                                    showingNames={showingNames}
                                     currentFilters={currentFilters}
                                     pagination={pagination}
                                     onPageChange={handlePageChange}

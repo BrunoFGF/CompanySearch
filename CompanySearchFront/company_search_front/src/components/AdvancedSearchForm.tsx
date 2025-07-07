@@ -11,18 +11,16 @@ export function AdvancedSearchForm({ onSearch, isLoading = false }: AdvancedSear
     const [nameFilter, setNameFilter] = useState('');
     const [addressFilter, setAddressFilter] = useState('');
     const [countryFilter, setCountryFilter] = useState('');
-    const [searchType, setSearchType] = useState<'all' | 'names'>('all');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        onSearch({
-            searchTerm: searchTerm.trim(),
-            nameFilter: nameFilter.trim(),
-            addressFilter: addressFilter.trim(),
-            countryFilter: countryFilter.trim(),
-            searchType
-        });
+            onSearch({
+                searchTerm: searchTerm.trim(),
+                nameFilter: nameFilter.trim(),
+                addressFilter: addressFilter.trim(),
+                countryFilter: countryFilter.trim()
+            });
     };
 
     const handleClear = () => {
@@ -34,8 +32,7 @@ export function AdvancedSearchForm({ onSearch, isLoading = false }: AdvancedSear
             searchTerm: '',
             nameFilter: '',
             addressFilter: '',
-            countryFilter: '',
-            searchType: 'all'
+            countryFilter: ''
         });
     };
 
@@ -114,22 +111,6 @@ export function AdvancedSearchForm({ onSearch, isLoading = false }: AdvancedSear
                                 disabled={isLoading}
                             />
                         </div>
-                    </div>
-                </div>
-
-                {/* Tipo de búsqueda */}
-                <div className="advanced-search-form__section">
-                    <h4 className="advanced-search-form__section-title">Tipo de Resultado</h4>
-                    <div className="advanced-search-form__field">
-                        <select
-                            value={searchType}
-                            onChange={(e) => setSearchType(e.target.value as 'all' | 'names')}
-                            className="advanced-search-form__select"
-                            disabled={isLoading}
-                        >
-                            <option value="all">Información completa</option>
-                            <option value="names">Solo nombres</option>
-                        </select>
                     </div>
                 </div>
 

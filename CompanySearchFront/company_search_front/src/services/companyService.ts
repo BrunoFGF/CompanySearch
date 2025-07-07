@@ -3,7 +3,6 @@ import { PAGINATION } from "../constants";
 import type {
     Company,
     CompanySearchResponse,
-    CompanyNamesSearchResponse,
     CompanySearchRequest,
     CreateCompanyDto,
     UpdateCompanyDto,
@@ -49,19 +48,6 @@ class CompanyService {
 
         const endpoint = `${API_CONFIG.ENDPOINTS.search}?${searchParams.toString()}`;
         return this.request<CompanySearchResponse>(endpoint);
-    }
-
-    async searchCompanyNames(params: CompanySearchRequest): Promise<CompanyNamesSearchResponse> {
-        const searchParams = new URLSearchParams();
-
-        if (params.searchTerm) searchParams.append('searchTerm', params.searchTerm);
-        if (params.addressFilter) searchParams.append('addressFilter', params.addressFilter);
-        if (params.countryFilter) searchParams.append('countryFilter', params.countryFilter);
-        if (params.page) searchParams.append('page', params.page.toString());
-        if (params.pageSize) searchParams.append('pageSize', params.pageSize.toString());
-
-        const endpoint = `${API_CONFIG.ENDPOINTS.searchNames}?${searchParams.toString()}`;
-        return this.request<CompanyNamesSearchResponse>(endpoint);
     }
 
     async getAllCompanies(page = 1, pageSize = PAGINATION.DEFAULT_PAGE_SIZE): Promise<CompanySearchResponse> {

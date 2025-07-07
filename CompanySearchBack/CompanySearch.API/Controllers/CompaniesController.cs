@@ -55,47 +55,6 @@ namespace CompanySearch.API.Controllers
             }
         }
 
-        [HttpGet("search/names")]
-        public async Task<ActionResult<CompanyNamesSearchResponse>> SearchCompanyNames(
-            [FromQuery] string? searchTerm = null,
-            [FromQuery] string? addressFilter = null,
-            [FromQuery] string? countryFilter = null,
-            [FromQuery] int page = 1,
-            [FromQuery] int pageSize = 10)
-        {
-            try
-            {
-                if (page < 1) page = 1;
-                if (pageSize < 1 || pageSize > 100) pageSize = 10;
-
-                if (string.IsNullOrEmpty(searchTerm) && string.IsNullOrEmpty(addressFilter) && string.IsNullOrEmpty(countryFilter))
-                {
-                    return BadRequest(new { message = "Al menos un filtro es requerido para búsqueda de nombres" });
-                }
-
-                var request = new CompanySearchRequest
-                {
-                    SearchTerm = searchTerm,
-                    AddressFilter = addressFilter,
-                    CountryFilter = countryFilter,
-                    Page = page,
-                    PageSize = pageSize
-                };
-
-                var response = await _companyService.SearchCompanyNamesAsync(request);
-
-                _logger.LogInformation("Names search completed. General: {SearchTerm}, Address: {AddressFilter}, Country: {CountryFilter}, Results: {Count}, Page: {Page}",
-                    searchTerm, addressFilter, countryFilter, response.TotalCount, page);
-
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SearchCompanyNames endpoint");
-                return StatusCode(500, new { message = "Error interno del servidor", error = ex.Message });
-            }
-        }
-
         [HttpGet("{id}")]
         public async Task<ActionResult<CompanyDto>> GetCompanyById(int id)
         {

@@ -72,59 +72,6 @@ namespace CompanySearch.API.Services
             }
         }
 
-        public async Task<CompanyNamesSearchResponse> SearchCompanyNamesAsync(CompanySearchRequest request)
-        {
-            try
-            {
-                var cacheKey = GenerateNamesCacheKey(request);
-
-                var cachedResult = await _cacheService.GetAsync<CompanyNamesSearchResponse>(cacheKey);
-                if (cachedResult != null)
-                {
-                    _logger.LogInformation("Cache HIT - Returning cached names for search");
-                    return cachedResult;
-                }
-
-                _logger.LogInformation("Cache MISS - Querying database for names search");
-
-                var query = _context.Companies.AsQueryable();
-
-                query = ApplyFiltersForNames(query, request);
-
-                var totalCount = await query.CountAsync();
-
-                var pageSize = Math.Min(request.PageSize, 100);
-
-                var companies = await query
-                    .Select(c => new Company { Id = c.Id, Name = c.Name })
-                    .OrderBy(c => c.Id)
-                    .Skip((request.Page - 1) * pageSize)
-                    .Take(pageSize)
-                    .AsNoTracking()
-                    .ToListAsync();
-
-                var companyNames = CompanyMapper.ToNameDto(companies);
-
-                var response = new CompanyNamesSearchResponse
-                {
-                    Companies = companyNames,
-                    TotalCount = totalCount,
-                    Page = request.Page,
-                    PageSize = pageSize,
-                    TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
-                };
-
-                await _cacheService.SetAsync(cacheKey, response, TimeSpan.FromMinutes(10));
-
-                return response;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error searching company names");
-                throw;
-            }
-        }
-
         private IQueryable<Company> ApplyFilters(IQueryable<Company> query, CompanySearchRequest request)
         {
             if (!string.IsNullOrEmpty(request.SearchTerm))
