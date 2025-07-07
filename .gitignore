@@ -31,3 +31,14 @@ Thumbs.db
 
 # Dependencies
 node_modules/
+
+node_modules
+npm-debug.log*
+dist
+*.local
+.vscode/
+.idea
+.DS_Store
+*.log
+.env*
+README*

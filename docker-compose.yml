@@ -78,6 +78,20 @@ services:
         condition: service_completed_successfully
     restart: unless-stopped
 
+  # React Frontend
+  frontend:
+    build:
+      context: ./CompanySearchFront/company_search_front
+      dockerfile: Dockerfile
+    container_name: company-search-frontend
+    environment:
+      - VITE_API_URL=http://localhost:${API_PORT}
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    restart: unless-stopped
+
 volumes:
   sqlserver_data:
   redis_data:
