@@ -3,6 +3,7 @@ import { SearchForm } from './components/SearchForm';
 import { CompanyList } from './components/CompanyList';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ErrorMessage } from './components/ErrorMessage';
+import { ToastProvider } from './components/ToastProvider';
 import { useCompanies } from './hooks/useCompanies';
 import { useSearchState } from './hooks/useSearchState';
 import type { SearchFilters } from './types/company';
@@ -53,46 +54,58 @@ function App() {
         }
     };
 
+    const handleCompanyChange = () => {
+        if (currentFilters) {
+            searchCompanies(currentFilters);
+        } else {
+            loadAllCompanies();
+        }
+    };
+
     const hasResults = companies.length > 0 || companyNames.length > 0;
     const showingNames = companyNames.length > 0;
 
     return (
-        <div className="app">
-            <Header />
+        <ToastProvider>
+            <div className="app">
+                <Header />
 
-            <main className="app__main">
-                <div className="app__container">
-                    <div className="app__search-section">
-                        <SearchForm onSearch={handleSearch} isLoading={isLoading} />
-                        {error && <ErrorMessage message={error} onRetry={handleRetry} />}
+                <main className="app__main">
+                    <div className="app__container">
+                        <div className="app__search-section">
+                            <SearchForm onSearch={handleSearch} isLoading={isLoading} />
+                            {error && <ErrorMessage message={error} onRetry={handleRetry} />}
+                        </div>
+
+                        <div className="app__content">
+                            {isLoading ? (
+                                <LoadingContent />
+                            ) : error ? null : hasResults ? (
+                                <CompanyList
+                                    companies={companies}
+                                    companyNames={companyNames}
+                                    showingNames={showingNames}
+                                    currentFilters={currentFilters}
+                                    pagination={pagination}
+                                    onPageChange={handlePageChange}
+                                    onPageSizeChange={handlePageSizeChange}
+                                    onCompanyChange={handleCompanyChange}
+                                    isLoading={isLoading}
+                                />
+                            ) : currentFilters ? (
+                                <NoResults searchTerm={currentFilters.searchTerm} />
+                            ) : null}
+                        </div>
                     </div>
+                </main>
 
-                    <div className="app__content">
-                        {isLoading ? (
-                            <LoadingContent />
-                        ) : error ? null : hasResults ? (
-                            <CompanyList
-                                companies={companies}
-                                companyNames={companyNames}
-                                showingNames={showingNames}
-                                currentFilters={currentFilters}
-                                pagination={pagination}
-                                onPageChange={handlePageChange}
-                                onPageSizeChange={handlePageSizeChange}
-                                isLoading={isLoading}
-                            />
-                        ) : currentFilters ? (
-                            <NoResults searchTerm={currentFilters.searchTerm} />
-                        ) : null}
-                    </div>
-                </div>
-            </main>
-
-            <Footer />
-        </div>
+                <Footer />
+            </div>
+        </ToastProvider>
     );
 }
 
+// Componentes auxiliares para mejor organización
 function Header() {
     return (
         <header className="app__header">
